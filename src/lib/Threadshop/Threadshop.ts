@@ -14,13 +14,22 @@ export class Threadshop extends EventEmitter {
     private ready: boolean;
     private logger: Logger;
     private pool: Pool;
+    private maxThreads: number;
 
     constructor({ dir, worker, logger, maxThreads }: ThreadshopConstructor) {
         super();
         this.dir = dir;
         this.ready = false;
         this.logger = logger;
-        this.pool = new Pool(!maxThreads || maxThreads > getCpus() ? getCpus() : maxThreads, this.logger);
+
+        if (maxThreads) this.maxThreads = maxThreads;
+        if (maxThreads && maxThreads === 0.5) this.maxThreads = Math.floor(getCpus() / 2);
+        if (maxThreads && maxThreads === 0.25) this.maxThreads = Math.floor(getCpus() / 4);
+        if (!maxThreads || maxThreads > getCpus()) this.maxThreads = getCpus();
+
+        this.pool = new Pool(this.maxThreads, this.logger);
+
+        if (maxThreads && maxThreads > getCpus()) this.logger.warn('"maxThreads" set too high. using OS CPUs instead.');
 
         worker.on('message', () => {
             logger.log('ready');

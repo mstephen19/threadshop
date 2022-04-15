@@ -1,6 +1,6 @@
 import { color } from 'console-log-colors';
 
-const { blueBright, redBright } = color;
+const { blueBright, redBright, yellowBright } = color;
 
 export class Logger {
     debug: boolean;
@@ -16,6 +16,10 @@ export class Logger {
 
     error(str: any) {
         console.log(redBright('threadshop error:'), str);
+    }
+
+    warn(str: any) {
+        console.log(yellowBright('threadshop warn:'), str);
     }
 
     errorString(str: string) {
